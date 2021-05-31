@@ -1,0 +1,44 @@
+#!/usr/bin/env python
+#
+# v2019-02-20 by markus.meissner@meissner.IT
+#
+# Distributed via ansible - mit.zabbix-agent.https-sites
+
+import json
+import glob
+
+from reconfigure.parsers import *
+from reconfigure.includers import *
+
+from zabbix_lld_https_sites_mitnginxparser import MitNginxParser
+
+data = list()
+
+# Nginx
+parser = MitNginxParser()
+for filename in glob.iglob('/etc/nginx/conf.d/server-*.conf'):
+    nodes = parser.parse(open(filename).read())
+    #print nodes
+
+    for server in nodes.get_all('server'):
+        if "443" in server.get('listen').value:
+            for site in server.get('server_name').value.split():
+                data.append({"{#HTTPSSITE}": site})
+        #    print server.get('server_name').value
+        #else:
+        #    print server.get('listen')
+
+# Apache
+import re
+serverNames = set()
+for filename in glob.iglob('/etc/apache2/sites-enabled/*.conf'):
+    for line in open(filename, 'r'):
+        serverName = re.search( r'ServerName (.*)', line, re.M|re.I)
+        if serverName:
+            serverNames.add(serverName.group(1))
+for serverName in serverNames:
+    data.append({"{#HTTPSSITE}": serverName})
+
+# Output all
+print(json.dumps({"data": data}, indent=4))
+
