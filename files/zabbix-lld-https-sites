@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 #
-# v2019-02-20 by markus.meissner@meissner.IT
-#
 # Distributed via ansible - mit.zabbix-agent.https-sites
+#
+# v2019-02-20 by markus.meissner@meissner.IT
 
 import json
 import glob
@@ -21,12 +21,9 @@ for filename in glob.iglob('/etc/nginx/conf.d/server-*.conf'):
     #print nodes
 
     for server in nodes.get_all('server'):
-        if "443" in server.get('listen').value:
+        if "443" in server.get('listen').value.split():
             for site in server.get('server_name').value.split():
                 data.append({"{#HTTPSSITE}": site})
-        #    print server.get('server_name').value
-        #else:
-        #    print server.get('listen')
 
 # Apache
 import re
