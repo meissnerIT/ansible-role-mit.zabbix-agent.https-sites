@@ -2,12 +2,14 @@
 #
 # Distributed via ansible - mit.zabbix-agent.https-sites
 #
-# v2022-02-03 by markus.meissner@meissner.IT
+# v2022-02-24 by markus.meissner@meissner.IT
 
 # https://www.askpython.com/python/python-command-line-arguments
 import argparse
+import csv
 import json
 import glob
+import os
 
 from reconfigure.parsers import *
 from reconfigure.includers import *
@@ -30,7 +32,7 @@ for filename in glob.iglob('/etc/nginx/conf.d/server-*.conf'):
     for server in nodes.get_all('server'):
         if args.include_http or "443" in server.get('listen').value.split():
             for site in server.get('server_name').value.split():
-                data.append({"{#HTTPSSITE}": site})
+                data.append({"{#HTTPSSITE}": site, "{#HTTPSPORT}": 443, "{#HTTPSSITENAME}": site})
 
 # Apache
 import re
@@ -41,7 +43,15 @@ for filename in glob.iglob('/etc/apache2/sites-enabled/*.conf'):
         if serverName:
             serverNames.add(serverName.group(1))
 for serverName in serverNames:
-    data.append({"{#HTTPSSITE}": serverName})
+    data.append({"{#HTTPSSITE}": serverName, "{#HTTPSPORT}": 443, "{#HTTPSSITENAME}": site})
+
+# Custom
+conffile = '/etc/zabbix/mit-zabbix-lld-https-sites.conf'
+if os.path.exists(conffile):
+    with open(conffile) as csvfile:
+        csvreader = csv.reader(csvfile)
+        for row in csvreader:
+            data.append({"{#HTTPSSITE}": row[0], "{#HTTPSPORT}": row[1], "{#HTTPSSITENAME}": row[2]})
 
 # Output all
 print(json.dumps({"data": data}, indent=4))
