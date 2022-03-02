@@ -10,7 +10,7 @@
 - name: Copy zabbix-lld-https-sites
   copy:
     src: "{{ item }}"
-    dest: /usr/local/sbin/
+    dest: /usr/local/bin/
     mode: 0755
   with_items:
     - zabbix-lld-https-sites
@@ -22,4 +22,12 @@
     dest: "{{ zabbix_agent_conf_dir }}"
     mode: 0644
   notify: Restart zabbix-agent
+
+- name: Remove deprecated scripts from sbin
+  file:
+    path: "/usr/local/sbin/{{ item }}"
+    state: absent
+  with_items:
+    - zabbix-lld-https-sites
+    - zabbix_lld_https_sites_mitnginxparser.py
 
