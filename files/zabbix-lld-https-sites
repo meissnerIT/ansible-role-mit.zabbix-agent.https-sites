@@ -2,7 +2,7 @@
 #
 # Distributed via ansible - mit.zabbix-agent.https-sites
 #
-# v2022-02-24 by markus.meissner@meissner.IT
+# v2022-03-03 by markus.meissner@meissner.IT
 
 # https://www.askpython.com/python/python-command-line-arguments
 import argparse
@@ -43,7 +43,7 @@ for filename in glob.iglob('/etc/apache2/sites-enabled/*.conf'):
         if serverName:
             serverNames.add(serverName.group(1))
 for serverName in serverNames:
-    data.append({"{#HTTPSSITE}": serverName, "{#HTTPSPORT}": 443, "{#HTTPSSITENAME}": site})
+    data.append({"{#HTTPSSITE}": serverName, "{#HTTPSPORT}": 443, "{#HTTPSSITENAME}": serverName})
 
 # Custom
 conffile = '/etc/zabbix/mit-zabbix-lld-https-sites.conf'
