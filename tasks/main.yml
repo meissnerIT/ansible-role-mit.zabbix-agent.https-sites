@@ -3,6 +3,7 @@
 # We now include mit.zabbix-agent.common via dependency in meta/main.yml
 # This provides handlers like "Restart zabbix-agent" and vars like "zabbix_agent_conf_dir"
 
+# python3-reconfigure is not available in Debian 11
 - name: Install python-reconfigure via apt
   apt:
     pkg: python3-reconfigure
