@@ -41,11 +41,13 @@
     mode: 0644
   notify: Restart zabbix-agent
 
-- name: Remove deprecated scripts from sbin
+- name: Remove deprecated scripts
   file:
-    path: "/usr/local/sbin/{{ item }}"
+    path: "/usr/local/{{ item }}"
     state: absent
   with_items:
-    - zabbix-lld-https-sites
-    - zabbix_lld_https_sites_mitnginxparser.py
+    - bin/zabbix-lld-https-sites
+    - bin/zabbix_lld_https_sites_mitnginxparser.py
+    - sbin/zabbix-lld-https-sites
+    - sbin/zabbix_lld_https_sites_mitnginxparser.py
 
