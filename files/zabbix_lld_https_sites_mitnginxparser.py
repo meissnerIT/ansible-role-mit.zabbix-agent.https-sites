@@ -1,9 +1,10 @@
 # Distributed via ansible - mit.zabbix-agent.https-sites
 # 
 # Simple hack: Copied from /usr/lib/python2.7/dist-packages/reconfigure/parsers/nginx.py
-# and added "add_header" as comment in the tokens in order to prevent the parsing from 
-# failing with 
+# and added "add_header" and others as comment in the tokens in order to prevent the
+# parsing from failing with 
 # add_header X-XSS-Protection "1; mode=block";
+# "" ""; (in the block $asset_immutable for nextcloud)
 
 from reconfigure.nodes import *
 from reconfigure.parsers import BaseParser
@@ -17,6 +18,7 @@ class MitNginxParser (BaseParser):
 
     tokens = [
         (r"add_header.*?\n", lambda s, t: ('comment', t)),
+        (r"\"\".*?\n", lambda s, t: ('comment', t)),
         (r"[\w_]+\s*?.*?{", lambda s, t: ('section_start', t)),
         (r"[\w_]+?.+?;", lambda s, t: ('option', t)),
         (r"\s", lambda s, t: 'whitespace'),
