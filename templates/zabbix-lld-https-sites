@@ -1,4 +1,4 @@
-#!/opt/mit-zabbix-lld-https-sites/.venv/bin/python
+#!{{ install_prefix }}/mit-zabbix-lld-https-sites/.venv/bin/python
 #
 # Distributed via ansible - mit.zabbix-agent.https-sites
 #
@@ -25,34 +25,34 @@ data = list()
 
 # Nginx
 parser = MitNginxParser()
-for filename in glob.iglob('/etc/nginx/conf.d/server-*.conf'):
+for filename in glob.iglob('{{ etc_prefix }}/etc/nginx/conf.d/server-*.conf'):
     nodes = parser.parse(open(filename).read())
     #print nodes
 
     for server in nodes.get_all('server'):
         if args.include_http or "443" in server.get('listen').value.split():
             for site in server.get('server_name').value.split():
-                data.append({"{#HTTPSSITE}": site, "{#HTTPSPORT}": 443, "{#HTTPSSITENAME}": site})
+                {% raw %}data.append({"{#HTTPSSITE}": site, "{#HTTPSPORT}": 443, "{#HTTPSSITENAME}": site}){% endraw %}
 
 # Apache
 import re
 serverNames = set()
-for filename in glob.iglob('/etc/apache2/sites-enabled/*.conf'):
+for filename in glob.iglob('{{ etc_prefix }}/etc/apache2/sites-enabled/*.conf'):
     for line in open(filename, 'r'):
         serverName = re.search( r'^[ \t]+ServerName (.*)', line, re.M|re.I)
         if serverName:
             serverNames.add(serverName.group(1))
         # We don't collect ServerAlias or http hosts as there are none at Monheim
 for serverName in serverNames:
-    data.append({"{#HTTPSSITE}": serverName, "{#HTTPSPORT}": 443, "{#HTTPSSITENAME}": serverName})
+    {% raw %}data.append({"{#HTTPSSITE}": serverName, "{#HTTPSPORT}": 443, "{#HTTPSSITENAME}": serverName}){% endraw %}
 
 # Custom
-conffile = '/etc/zabbix/mit-zabbix-lld-https-sites.conf'
+conffile = '{{ etc_prefix }}/etc/zabbix/mit-zabbix-lld-https-sites.conf'
 if os.path.exists(conffile):
     with open(conffile) as csvfile:
         csvreader = csv.reader(csvfile)
         for row in csvreader:
-            data.append({"{#HTTPSSITE}": row[0], "{#HTTPSPORT}": row[1], "{#HTTPSSITENAME}": row[2]})
+            {% raw %}data.append({"{#HTTPSSITE}": row[0], "{#HTTPSPORT}": row[1], "{#HTTPSSITENAME}": row[2]}){% endraw %}
 
 # Output all
 print(json.dumps({"data": data}, indent=4))

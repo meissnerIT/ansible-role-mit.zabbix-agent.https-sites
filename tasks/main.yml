@@ -6,36 +6,38 @@
 - name: Copy requirements.txt
   copy:
     src: requirements.txt
-    dest: /opt/mit-zabbix-lld-https-sites/
+    dest: "{{ install_prefix }}/mit-zabbix-lld-https-sites/"
 
+# no need to install on FreeBSD
 - name: Install python3-venv
   apt:
     pkg: python3-venv
+  when: ansible_os_family == "Debian"
 
 - name: Install pip in venv
   pip:
     name: pip
-    virtualenv: /opt/mit-zabbix-lld-https-sites/.venv
+    virtualenv: "{{ install_prefix }}/mit-zabbix-lld-https-sites/.venv"
     virtualenv_command: python3 -m venv
 
 - name: Updated python dependencies (requirements.txt)
   pip:
     virtualenv_command: python3 -m venv
-    requirements: /opt/mit-zabbix-lld-https-sites/requirements.txt
-    virtualenv: /opt/mit-zabbix-lld-https-sites/.venv
+    requirements: "{{ install_prefix }}/mit-zabbix-lld-https-sites/requirements.txt"
+    virtualenv: "{{ install_prefix }}/mit-zabbix-lld-https-sites/.venv"
   environment: "{{ proxy_env }}"
 
 - name: Copy zabbix-lld-https-sites
-  copy:
+  template:
     src: "{{ item }}"
-    dest: /opt/mit-zabbix-lld-https-sites/bin/
+    dest: "{{ install_prefix }}/mit-zabbix-lld-https-sites/bin/"
     mode: 0755
-  with_items:
+  loop:
     - zabbix-lld-https-sites
     - zabbix_lld_https_sites_mitnginxparser.py  
 
 - name: Add zabbix-agent configuration file
-  copy:
+  template:
     src: local-userparameter_https-sites.conf
     dest: "{{ zabbix_agent_conf_dir }}"
     mode: 0644
