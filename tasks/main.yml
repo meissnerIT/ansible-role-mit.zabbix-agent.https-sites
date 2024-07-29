@@ -8,11 +8,15 @@
     src: requirements.txt
     dest: "{{ install_prefix }}/mit-zabbix-lld-https-sites/"
 
-# no need to install on FreeBSD
 - name: Install python3-venv
   apt:
     pkg: python3-venv
   when: ansible_os_family == "Debian"
+
+- name: Install py39-packaging
+  package:
+    name: py39-packaging-23.2
+  when: ansible_os_family == "FreeBSD"
 
 - name: Install pip in venv
   pip:
