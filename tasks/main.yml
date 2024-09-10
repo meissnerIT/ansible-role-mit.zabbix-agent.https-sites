@@ -13,9 +13,16 @@
     pkg: python3-venv
   when: ansible_os_family == "Debian"
 
-- name: Install py39-packaging
+# Either 39 or 311
+- name: Get python packaging prefix
+  shell: pkg info|egrep -o "^python[0-9]{2,3}-"|egrep -o "[0-9]+"
+  register: python_packaging_prefix
+  changed_when: no
+  when: ansible_os_family == "FreeBSD"
+
+- name: Install python packaging {{ python_packaging_prefix.stdout }}
   package:
-    name: py39-packaging-23.2
+    name: py{{ python_packaging_prefix.stdout }}-packaging
   when: ansible_os_family == "FreeBSD"
 
 - name: Install pip in venv
