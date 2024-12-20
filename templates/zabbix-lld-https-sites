@@ -1,4 +1,4 @@
-#!{{ install_prefix }}/mit-zabbix-lld-https-sites/.venv/bin/python
+#!/opt/mit-zabbix-lld-https-sites/.venv/bin/python
 #
 # Distributed via ansible - mit.zabbix-agent.https-sites
 #
