@@ -3,7 +3,7 @@
 # This provides handlers like "Restart zabbix-agent" and vars like "zabbix_agent_conf_dir"
 
 ##############################################################################
-# mit-venv v2024-11-07
+# mit-venv v2025-01-29
 ##############################################################################
 
 - name: Set target to /opt/mit-zabbix-lld-https-sites
@@ -14,6 +14,7 @@
   ansible.builtin.copy:
     src: requirements.txt
     dest: "{{ target }}/"
+    mode: "644"
 
 - name: Install python3-venv
   ansible.builtin.apt:
@@ -21,13 +22,13 @@
   when: ansible_os_family == "Debian"
 
 # Either 39 or 311 (py39 py311)
-- name: Get python prefix
+- name: Get python prefix # noqa: risky-shell-pipe
   ansible.builtin.shell: pkg info|egrep -o "^python[0-9]{2,3}-"|egrep -o "[0-9]+"
   register: python_prefix
   changed_when: false
   when: ansible_os_family == "FreeBSD"
 
-- name: Install py{{ python_prefix.stdout }}-packaging
+- name: Install py{{ python_prefix.stdout }}-packaging # noqa: name[template]
   ansible.builtin.package:
     name: py{{ python_prefix.stdout }}-packaging
   when: ansible_os_family == "FreeBSD"
