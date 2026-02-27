@@ -3,7 +3,7 @@
 # This provides handlers like "Restart zabbix-agent" and vars like "zabbix_agent_conf_dir"
 
 ##############################################################################
-# mit-venv v2025-01-29
+# mit-python-venv mit-venv v2026-02-25
 ##############################################################################
 
 - name: Set target to /opt/mit-zabbix-lld-https-sites
@@ -16,9 +16,12 @@
     dest: "{{ target }}/"
     mode: "644"
 
-- name: Install python3-venv
+# python3-packaging required on Debian 13
+- name: Install python3-packaging and python3-packaging
   ansible.builtin.apt:
-    pkg: python3-venv
+    name:
+      - python3-packaging
+      - python3-venv
   when: ansible_os_family == "Debian"
 
 # Either 39 or 311 (py39 py311)
